@@ -1,6 +1,5 @@
 module.exports = {
-
-  title: 'Vue Admin Template',
+  title: '燃气管道失效抢险系统',
 
   /**
    * @type {boolean} true | false

@@ -1,0 +1,39 @@
+$base-margin: 10px;
+$base-padding: 10px;
+
+
+.clearfix {
+  &::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+}
+
+.fn-pull-left {
+  float: left;
+}
+.fn-pull-right {
+  float: right;
+}
+
+.fn-bml {
+  margin-left: $base-margin;
+}
+.fn-bmr {
+  margin-right: $base-margin;
+}
+.fn-bmt {
+  margin-top: $base-margin;
+}
+.fn-bmb {
+  margin-bottom: $base-margin;
+}
+.fn-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.fn-delete {
+  color: #f56c6c;
+}
