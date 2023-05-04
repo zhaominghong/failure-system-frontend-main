@@ -31,3 +31,11 @@ export function deleteEvent(params) {
     data: params
   })
 }
+
+export function batchDeleteEvent(params) {
+  return request({
+    url: '/event/batchDelete',
+    method: 'post',
+    data: params
+  })
+}

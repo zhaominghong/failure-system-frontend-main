@@ -55,12 +55,7 @@
         </template>
       </el-table-column>
     </CommonTable>
-    <el-dialog
-      title="新增事件"
-      :visible.sync="dialogVisible"
-      :show-close="false"
-      width="30%"
-      :before-close="handleClose">
+    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" width="30%">
       <el-form ref="eventForm" :model="eventForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="eventForm.title" :disabled="onlyShow" autocomplete="off" />
@@ -146,7 +141,7 @@
 </template>
 
 <script>
-import { getEventList, createEvent, deleteEvent } from '@/api/event'
+import { getEventList, createEvent, deleteEvent, batchDeleteEvent } from '@/api/event'
 import { getPersonnelList } from '@/api/personnel'
 import { getPipelineList } from '@/api/pipeline'
 import CommonTable from '@/components/Table/index.vue'
@@ -251,9 +246,6 @@ export default {
     exportBatch() {
 
     },
-    handleClose() {
-
-    },
     getPersonnelName(handler_id) {
       const handler = this.personnelList.find(item => item.id === handler_id)
       return handler?.name
@@ -283,10 +275,11 @@ export default {
       this.selections = [...selection]
     },
     handleCurrentChange(pageNo) {
-      console.log(pageNo)
+      this.params.start = pageNo * this.params.limit
+      this.fetchData()
     },
     handleSizeChange(limit) {
-      console.log(limit)
+      this.params.limit = limit
     },
     handleShow(item) {
       this.onlyShow = true
@@ -310,8 +303,15 @@ export default {
         this.$message.error('事件删除失败')
       }
     },
-    handleDeleteBatch() {
-      console.log(this.selections)
+    async handleDeleteBatch() {
+      const ids = this.selections.map(item => item.id)
+      const res = await batchDeleteEvent({ ids: ids })
+      if (this.$$isResponseSuccess(res)) {
+        this.$message.success('事件批量删除成功')
+        this.fetchData()
+      } else {
+        this.$message.error('事件批量删除失败')
+      }
     }
   }
 }
