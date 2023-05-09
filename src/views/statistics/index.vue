@@ -31,19 +31,19 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="submit_time" label="提交时间" width="200">
+      <el-table-column align="center" prop="submit_time" label="提交时间" width="150">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ new Date(scope.row.submit_time).toLocaleString() }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="handler_time" label="处理时间" width="200">
+      <el-table-column align="center" prop="handler_time" label="处理时间" width="150">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ new Date(scope.row.handler_time).toLocaleString() }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="120">
+      <el-table-column fixed="right" align="center" label="操作" width="120">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="handleShow(scope.row)">查看</el-button>
           <el-button type="text" size="small" @click="handleEdit(scope.row)">编辑</el-button>

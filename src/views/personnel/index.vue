@@ -17,16 +17,16 @@
       @handleCurrentChange="handleCurrentChange"
       @handleSizeChange="handleSizeChange">
       <el-table-column fixed="left" type="selection" align="center" width="40" />
-      <el-table-column prop="name" align label="姓名" />
-      <el-table-column align label="身份">
+      <el-table-column prop="name" align="center" label="姓名" />
+      <el-table-column align="center" label="身份">
         <template slot-scope="scope">
           {{ personnelMap[scope.row.identity] }}
         </template>
       </el-table-column>
-      <el-table-column prop="identityNo" align label="身份证号" />
-      <el-table-column prop="telePhoneNo" align label="电话号码" />
-      <el-table-column prop="email" align label="邮箱" />
-      <el-table-column fixed="right" label="操作" width="120">
+      <el-table-column prop="identityNo" align="center" label="身份证号" />
+      <el-table-column prop="telePhoneNo" align="center" label="电话号码" />
+      <el-table-column prop="email" align="center" label="邮箱" />
+      <el-table-column fixed="right" align="center" label="操作" width="120">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="handleShow(scope.row)">查看</el-button>
           <el-button type="text" size="small" @click="handleEdit(scope.row)">编辑</el-button>

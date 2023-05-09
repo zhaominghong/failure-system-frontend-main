@@ -8,7 +8,7 @@
       auto-complete="on"
       label-position="left">
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">燃气管道失效抢险系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -53,8 +53,8 @@
       </el-button>
 
       <div class="tips">
-        <span style="margin-right:20px;">username: zhaominghong</span>
-        <span> password: 123456</span>
+        <!-- <span style="margin-right:20px;">username: zhaominghong</span>
+        <span> password: 123456</span> -->
       </div>
     </el-form>
   </div>

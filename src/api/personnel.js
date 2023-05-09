@@ -12,7 +12,7 @@ export function createPersonnel(params) {
   return request({
     url: '/personnel/add',
     method: 'post',
-    params
+    data: params
   })
 }
 
