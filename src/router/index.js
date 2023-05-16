@@ -47,9 +47,9 @@ export const constantRoutes = [
         meta: { title: '事件统计', icon: 'table' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
+        path: 'chart',
+        name: 'Chart',
+        component: () => import('@/views/chart/index'),
         meta: { title: '图表分析', icon: 'el-icon-s-data' }
       }
     ]
@@ -77,6 +77,30 @@ export const constantRoutes = [
         name: 'Task',
         component: () => import('@/views/task/index'),
         meta: { title: '任务中心', icon: 'nested' }
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Profile',
+        component: () => import('@/views/profile/index'),
+        meta: { title: '个人中心', icon: 'el-icon-notebook-2' }
+      }
+    ]
+  },
+  {
+    path: '/audit',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Audit',
+        component: () => import('@/views/audit/index'),
+        meta: { title: '事件审核', icon: 'el-icon-edit' }
       }
     ]
   },
