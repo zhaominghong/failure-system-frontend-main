@@ -15,7 +15,8 @@
       :total="total"
       @handleSelectionChange="handleSelectEvents"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange">
+      @handleSizeChange="handleSizeChange"
+    >
       <el-table-column fixed="left" type="selection" align="center" width="40" />
       <el-table-column prop="title" label="事件标题" align="center" />
       <el-table-column label="处理人员" width="110" align="center">
@@ -55,7 +56,7 @@
         </template>
       </el-table-column>
     </CommonTable>
-    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" width="30%">
+    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
       <el-form ref="eventForm" :model="eventForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="eventForm.title" :disabled="onlyShow" autocomplete="off" />
@@ -71,12 +72,14 @@
           <el-select
             v-model.number="eventForm.status"
             placeholder="请选择状态"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in statusList"
               :key="item.status"
               :label="item.label"
-              :value="item.status" />
+              :value="item.status"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="处理人员" prop="handler_id">
@@ -84,12 +87,14 @@
           <el-select
             v-model.number="eventForm.handler_id"
             placeholder="请选择处理人员"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="处理时间" prop="handler_time">
@@ -100,12 +105,14 @@
           <el-select
             v-model.number="eventForm.manager_id"
             placeholder="请选择负责人"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="管道id" prop="pipeline_id">
@@ -113,12 +120,14 @@
           <el-select
             v-model.number="eventForm.pipeline_id"
             placeholder="请选择管道"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in pipelineList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="事件级别" prop="level">
@@ -128,7 +137,8 @@
               v-for="item in levelList"
               :key="item.level"
               :label="item.label"
-              :value="item.level" />
+              :value="item.level"
+            />
           </el-select>
         </el-form-item>
       </el-form>

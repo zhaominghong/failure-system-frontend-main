@@ -2,12 +2,17 @@
   <div class="profile-container">
     <el-card>
       <div class="avatar-wrapper">
-        <el-avatar :src="userInfo.actor_url" :size="120" />
+        <div class="avatar-container">
+          <el-avatar :src="userInfo.avatar" :size="120" fit="cover" />
+        </div>
         <el-upload
           class="avatar-upload"
-          action="/upload"
+          :action="uploadURL"
           :show-file-list="false"
-          :on-success="handleAvatarUpload">
+          name="avatar"
+          :headers="headers"
+          :on-success="handleAvatarUpload"
+        >
           <el-button type="primary">更换头像</el-button>
         </el-upload>
       </div>
@@ -21,6 +26,9 @@
         <el-form-item label="电话号码">
           <el-input v-model="userInfo.phone" />
         </el-form-item>
+        <el-form-item label="身份类别">
+          <el-input v-model="roleMap[userInfo.role]" disabled />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="updateUserInfo">保存</el-button>
         </el-form-item>
@@ -30,6 +38,9 @@
 </template>
 
 <script>
+import { getInfo, updateInfo } from '@/api/user'
+import { getToken } from '@/utils/auth'
+
 export default {
   data() {
     return {
@@ -37,7 +48,17 @@ export default {
         username: '',
         email: '',
         phone: '',
-        actor_url: ''
+        avatar: '',
+        role: ''
+      },
+      roleMap: {
+        1: '巡线人员',
+        2: '抢险人员',
+        3: '管理员'
+      },
+      uploadURL: process.env.VUE_APP_BASE_API + '/user/upload',
+      headers: {
+        'Authorization': getToken()
       }
     }
   },
@@ -46,30 +67,32 @@ export default {
     this.getUserInfo()
   },
   methods: {
-    getUserInfo() {
-      // 从后端 API 获取用户信息，填充到 this.userInfo
-      // 可以使用 axios 或其他库发送请求
-      // 示例代码：
-      // axios.get('/api/user/info').then(response => {
-      //   this.userInfo = response.data;
-      // }).catch(error => {
-      //   console.error(error);
-      // });
+    async getUserInfo() {
+      const res = await getInfo()
+      if (this.$$isResponseSuccess(res)) {
+        this.userInfo = res.data.userinfo
+      }
     },
-    updateUserInfo() {
-      // 提交更新后的用户信息到后端 API
-      // 示例代码：
-      // axios.post('/api/user/update', this.userInfo).then(response => {
-      //   console.log('User info updated successfully');
-      // }).catch(error => {
-      //   console.error(error);
-      // });
+    async updateUserInfo() {
+      const res = await updateInfo(this.userInfo)
+      if (this.$$isResponseSuccess(res)) {
+        this.$message.success(res.message)
+        await this.getUserInfo()
+        this.$store.commit('user/SET_AVATAR', this.userInfo.avatar)
+        this.$store.commit('user/SET_NAME', this.userInfo.username)
+      } else {
+        this.$message.error(res.message)
+      }
     },
-    handleAvatarUpload(response) {
-      // 头像上传成功后的回调函数
-      // 更新 this.userInfo.actor_url
-      // 示例代码：
-      // this.userInfo.actor_url = response.data.url;
+    async handleAvatarUpload(response) {
+      if (this.$$isResponseSuccess(response)) {
+        this.$message.success(response.message)
+        await this.getUserInfo()
+        this.$store.commit('user/SET_AVATAR', this.userInfo.avatar)
+        this.$store.commit('user/SET_NAME', this.userInfo.username)
+      } else {
+        this.$message.error(response.message)
+      }
     }
   }
 }
@@ -87,6 +110,12 @@ export default {
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
+}
+.avatar-container .el-avatar.el-avatar--circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .avatar-upload {

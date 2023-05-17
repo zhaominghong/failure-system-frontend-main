@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="chart-row">
-      <div id="barChart" class="chart" />
+      <div id="barChart" class="chart-large" />
     </div>
   </div>
 </template>
@@ -35,6 +35,10 @@ export default {
         title: {
           text: '失效事件级别比例',
           x: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
         },
         series: [
           {
@@ -77,6 +81,9 @@ export default {
         yAxis: {
           type: 'value'
         },
+        tooltip: {
+          trigger: 'axis'
+        },
         series: [
           {
             name: '事件数量',
@@ -90,36 +97,36 @@ export default {
     drawBarChart() {
       const barChart = echarts.init(document.getElementById('barChart'))
       const data = [
-        { pipe: '一号管道', count: 23 },
-        { pipe: '二号管道', count: 27 },
-        { pipe: '三号管道', count: 38 },
-        { pipe: '四号管道', count: 18 },
-        { pipe: '五号管道', count: 10 }
+        { pipe: '一号管道', count: [23, 15, 8] },
+        { pipe: '二号管道', count: [27, 20, 7] },
+        { pipe: '三号管道', count: [38, 28, 10] },
+        { pipe: '四号管道', count: [18, 14, 4] },
+        { pipe: '五号管道', count: [10, 5, 5] }
       ]
+      const legendData = ['事件数', '已完成数', '未完成数']
       const xAxisData = data.map(item => item.pipe)
-      const seriesData = data.map(item => item.count)
+      const seriesData = legendData.map((name, index) => ({
+        name: name,
+        type: 'bar',
+        data: data.map(item => item.count[index])
+      }))
       const option = {
         title: {
-          text: '不同管道的失效事件数量',
+          text: '各管道事件数量',
           x: 'center'
         },
-        xAxis: {
-          type: 'category',
-          data: xAxisData
+        legend: {
+          data: legendData,
+          bottom: '0'
         },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
-          {
-            name: '事件数量',
-            type: 'bar',
-            data: seriesData
-          }
-        ]
+        tooltip: {},
+        xAxis: { type: 'category', data: xAxisData },
+        yAxis: {},
+        series: seriesData
       }
       barChart.setOption(option)
     }
+
   }
 }
 </script>
@@ -129,6 +136,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 20px;
 }
 
 .chart-row {
@@ -142,7 +150,11 @@ export default {
 }
 
 .chart {
-  width: 400px;
+  width: 40vw;
   height: 300px;
+}
+.chart-large {
+  width: 90vw;
+  height: 500px;
 }
 </style>

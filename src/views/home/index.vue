@@ -1,7 +1,7 @@
 <template>
   <div class="home-container">
     <div id="mapview" />
-    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" width="30%">
+    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
       <el-form ref="eventForm" :model="eventForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="eventForm.title" autocomplete="off" />

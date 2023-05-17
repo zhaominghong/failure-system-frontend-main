@@ -15,7 +15,8 @@
       :loading="listLoading"
       @handleSelectionChange="handleSelectPersonnels"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange">
+      @handleSizeChange="handleSizeChange"
+    >
       <el-table-column fixed="left" type="selection" align="center" width="40" />
       <el-table-column prop="name" align="center" label="姓名" />
       <el-table-column align="center" label="身份">
@@ -38,13 +39,36 @@
         </template>
       </el-table-column>
     </CommonTable>
-    <el-dialog title="新增人员" :visible.sync="dialogVisible" :show-close="false" width="30%">
+    <el-dialog :visible.sync="uploadVisible" :show-close="false" :close-on-click-modal="false" width="400px">
+      <el-upload
+        ref="upload"
+        class="upload el-upload-dragger"
+        :action="uploadURL"
+        accept=".xlsx"
+        :headers="headers"
+        :on-success="handleSuccess"
+        :on-error="handleError"
+        :on-remove="handleRemove"
+        :file-list="fileList"
+        :auto-upload="false"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button v-show="!onlyShow" type="primary" @click="handleUploadSubmit">上 传</el-button>
+        <el-button @click="handleUploadCancel">关 闭</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="新增人员" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
       <el-form
         ref="personnelForm"
         :model="personnelForm"
         status-icon
         :rules="rules"
-        label-width="100px">
+        label-width="100px"
+      >
         <el-form-item label="姓名" prop="name">
           <el-input v-model="personnelForm.name" :disabled="onlyShow" />
         </el-form-item>
@@ -53,12 +77,14 @@
           <el-select
             v-model.number="personnelForm.identity"
             placeholder="请选择身份"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in identityList"
               :key="item.indentity"
               :label="item.label"
-              :value="item.indentity" />
+              :value="item.indentity"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="身份证号" prop="identityNo">
@@ -69,9 +95,6 @@
         </el-form-item>
         <el-form-item label="邮箱地址" prop="email">
           <el-input v-model="personnelForm.email" :disabled="onlyShow" />
-        </el-form-item>
-        <el-form-item label="头像" prop="avatar">
-          <el-input v-model="personnelForm.avatar" :disabled="onlyShow" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -87,6 +110,8 @@ import { getPersonnelList, createPersonnel, deletePersonnel, batchDeletePersonne
 
 import CommonTable from '@/components/Table/index.vue'
 import Search from '@/components/Search/index.vue'
+import { exportToExcel } from '@/utils/index.js'
+import { getToken } from '@/utils/auth'
 
 export default {
   components: {
@@ -99,9 +124,14 @@ export default {
       total: 0,
       listLoading: false,
       dialogVisible: false,
+      uploadVisible: false,
       onlyShow: false,
       searchName: '',
       selections: [],
+      uploadURL: process.env.VUE_APP_BASE_API + '/personnel/import',
+      headers: {
+        'Authorization': getToken()
+      },
       params: {
         limit: 10,
         start: 0
@@ -116,17 +146,16 @@ export default {
         identity: '',
         identityNo: '',
         telePhoneNo: '',
-        email: '',
-        avatar: ''
+        email: ''
       },
       rules: {
         name: [{ required: true }],
         identity: [{ required: true }],
         identityNo: [{ required: true }],
         telePhoneNo: [{ required: true }],
-        email: [],
-        avatar: []
-      }
+        email: []
+      },
+      fileList: []
     }
   },
   created() {
@@ -150,10 +179,15 @@ export default {
       this.dialogVisible = true
     },
     importBatch() {
-
+      this.uploadVisible = true
     },
     exportBatch() {
-
+      exportToExcel(this.selections.map(item => {
+        delete item.id
+        delete item.actor
+        item.identity = this.personnelMap[item.identity]
+        return item
+      }), ['姓名', '身份', '身份证号', '电话号码', '邮箱'], '人员列表' + Date.now())
     },
     handleCancel() {
       this.personnelForm = this.$options.data.call(this).personnelForm
@@ -217,6 +251,27 @@ export default {
       } else {
         this.$message.error('人员批量删除失败')
       }
+    },
+    handleUploadCancel() {
+      this.uploadVisible = false
+    },
+    handleUploadSubmit() {
+      this.$refs.upload.submit()
+    },
+    handleRemove(file, fileList) {
+      const removeIndex = this.fileList.findIndex(item => item.uid === file.uid)
+      this.fileList.unshift(removeIndex, 1)
+    },
+    handleSuccess(res, file, fileList) {
+      if (this.$$isResponseSuccess(res)) {
+        this.$message.success('导入成功')
+      } else {
+        this.$message.error('导入失败')
+      }
+    },
+    handleError(err, file, fileList) {
+      console.log(err)
+      this.$message.error('导入失败')
     }
   }
 }

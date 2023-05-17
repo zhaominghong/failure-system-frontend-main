@@ -8,6 +8,8 @@
  * @param {string} cFormat
  * @returns {string | null}
  */
+import * as XLSX from 'xlsx'
+
 export function parseTime(time, cFormat) {
   if (arguments.length === 0 || !time) {
     return null
@@ -114,4 +116,48 @@ export function param2Obj(url) {
     }
   })
   return obj
+}
+
+export function exportToCsv(data, columns, filename = Date.now()) {
+  let csvContent = `${columns.join(',')}\n`
+  data.forEach((item) => {
+    const row = `${Object.values(item).join(',')}\n`
+    csvContent += row
+  })
+
+  const csvData = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+
+  // 创建一个下载链接
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(csvData)
+  link.setAttribute('download', `${filename}.csv`)
+  link.click()
+}
+
+export function exportToExcel(data, columns, filename) {
+  const worksheet = XLSX.utils.json_to_sheet(data)
+  // 添加表头数据
+  const header = columns
+  header.forEach((value, index) => {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: index })
+    worksheet[cell] = { t: 's', v: value, s: { font: { bold: true }}}
+  })
+
+  // 设置表头行高
+  worksheet['!rows'] = [{ hpt: 20 }]
+
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+
+  // 将工作簿转换为二进制数据
+  const excelData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+
+  // 创建一个 Blob 对象
+  const blob = new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+  // 创建一个下载链接
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', `${filename}.xlsx`)
+  link.click()
 }
