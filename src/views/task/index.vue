@@ -15,8 +15,7 @@
       :loading="listLoading"
       @handleSelectionChange="handleSelectEvents"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    >
+      @handleSizeChange="handleSizeChange">
       <el-table-column fixed="left" type="selection" align="center" width="40" />
       <el-table-column prop="title" align="center" label="任务标题" />
       <!-- <el-table-column prop="title" align="center" label="任务名" /> -->
@@ -67,7 +66,11 @@
         </template>
       </el-table-column>
     </CommonTable>
-    <el-dialog title="新增任务" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
+    <el-dialog
+      title="新增任务"
+      :visible.sync="dialogVisible"
+      :show-close="false"
+      :close-on-click-modal="false">
       <el-form ref="taskForm" :model="taskForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="taskForm.title" :disabled="onlyShow" />
@@ -80,14 +83,12 @@
           <el-select
             v-model.number="taskForm.event_id"
             placeholder="请选择事件"
-            :disabled="onlyShow"
-          >
+            :disabled="onlyShow">
             <el-option
               v-for="item in eventList"
               :key="item.id"
               :label="item.title"
-              :value="item.id"
-            />
+              :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="处理人员" prop="handler_id">
@@ -95,14 +96,12 @@
           <el-select
             v-model.number="taskForm.handler_id"
             placeholder="请选择处理人员"
-            :disabled="onlyShow"
-          >
+            :disabled="onlyShow">
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id"
-            />
+              :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="级别" prop="level">
@@ -112,8 +111,7 @@
               v-for="item in levelList"
               :key="item.level"
               :label="item.label"
-              :value="item.level"
-            />
+              :value="item.level" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
@@ -123,8 +121,7 @@
               v-for="item in statusList"
               :key="item.status"
               :label="item.label"
-              :value="item.status"
-            />
+              :value="item.status" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -276,7 +273,7 @@ export default {
       this.selections = [...selection]
     },
     handleCurrentChange(pageNo) {
-      this.params.start = pageNo * this.params.limit
+      this.params.start = (pageNo - 1) * this.params.limit
       this.fetchData()
     },
     handleSizeChange(limit) {

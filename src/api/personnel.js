@@ -15,6 +15,13 @@ export function createPersonnel(params) {
     data: params
   })
 }
+export function updatePersonnel(params) {
+  return request({
+    url: '/personnel/update',
+    method: 'post',
+    data: params
+  })
+}
 
 export function deletePersonnel(params) {
   return request({

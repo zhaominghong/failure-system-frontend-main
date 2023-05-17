@@ -15,8 +15,7 @@
       :loading="listLoading"
       @handleSelectionChange="handleSelectPersonnels"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    >
+      @handleSizeChange="handleSizeChange">
       <el-table-column fixed="left" type="selection" align="center" width="40" />
       <el-table-column prop="name" align="center" label="姓名" />
       <el-table-column align="center" label="身份">
@@ -39,7 +38,11 @@
         </template>
       </el-table-column>
     </CommonTable>
-    <el-dialog :visible.sync="uploadVisible" :show-close="false" :close-on-click-modal="false" width="400px">
+    <el-dialog
+      :visible.sync="uploadVisible"
+      :show-close="false"
+      :close-on-click-modal="false"
+      width="400px">
       <el-upload
         ref="upload"
         class="upload el-upload-dragger"
@@ -50,8 +53,7 @@
         :on-error="handleError"
         :on-remove="handleRemove"
         :file-list="fileList"
-        :auto-upload="false"
-      >
+        :auto-upload="false">
         <i class="el-icon-upload" />
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
@@ -61,14 +63,17 @@
         <el-button @click="handleUploadCancel">关 闭</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="新增人员" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
+    <el-dialog
+      title="新增人员"
+      :visible.sync="dialogVisible"
+      :show-close="false"
+      :close-on-click-modal="false">
       <el-form
         ref="personnelForm"
         :model="personnelForm"
         status-icon
         :rules="rules"
-        label-width="100px"
-      >
+        label-width="100px">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="personnelForm.name" :disabled="onlyShow" />
         </el-form-item>
@@ -77,14 +82,12 @@
           <el-select
             v-model.number="personnelForm.identity"
             placeholder="请选择身份"
-            :disabled="onlyShow"
-          >
+            :disabled="onlyShow">
             <el-option
               v-for="item in identityList"
               :key="item.indentity"
               :label="item.label"
-              :value="item.indentity"
-            />
+              :value="item.indentity" />
           </el-select>
         </el-form-item>
         <el-form-item label="身份证号" prop="identityNo">
@@ -106,7 +109,7 @@
 </template>
 
 <script>
-import { getPersonnelList, createPersonnel, deletePersonnel, batchDeletePersonnel } from '@/api/personnel'
+import { getPersonnelList, createPersonnel, deletePersonnel, batchDeletePersonnel, updatePersonnel } from '@/api/personnel'
 
 import CommonTable from '@/components/Table/index.vue'
 import Search from '@/components/Search/index.vue'
@@ -142,6 +145,7 @@ export default {
       },
       identityList: [{ indentity: 1, label: '巡线人员' }, { indentity: 2, label: '抢险人员' }],
       personnelForm: {
+        id: '',
         name: '',
         identity: '',
         identityNo: '',
@@ -199,13 +203,13 @@ export default {
       const that = this
       this.$refs['personnelForm'].validate(async valid => {
         if (valid) {
-          const res = await createPersonnel(this.personnelForm)
+          const res = this.personnelForm.id ? await updatePersonnel(this.personnelForm) : await createPersonnel(this.personnelForm)
           if (this.$$isResponseSuccess(res)) {
             that.dialogVisible = false
-            this.fetchData()
-            this.$messsage.success('新增人员成功')
+            that.fetchData()
+            that.$message.success(res.msg)
           } else {
-            this.$message.error('新增人员失败')
+            that.$message.error(res.msg)
           }
         }
       })
@@ -214,7 +218,7 @@ export default {
       this.selections = [...selection]
     },
     handleCurrentChange(pageNo) {
-      this.params.start = pageNo * this.params.limit
+      this.params.start = (pageNo - 1) * this.params.limit
       this.fetchData()
     },
     handleSizeChange(limit) {
@@ -260,11 +264,12 @@ export default {
     },
     handleRemove(file, fileList) {
       const removeIndex = this.fileList.findIndex(item => item.uid === file.uid)
-      this.fileList.unshift(removeIndex, 1)
+      this.fileList.shift(removeIndex, 1)
     },
     handleSuccess(res, file, fileList) {
       if (this.$$isResponseSuccess(res)) {
         this.$message.success('导入成功')
+        this.fetchData()
       } else {
         this.$message.error('导入失败')
       }
