@@ -248,7 +248,7 @@ export default {
           // 创建一个简单的Polyline
           const lineGeometry = {
             type: 'polyline',
-            paths: baseData.pipelines
+            paths: JSON.parse(that.pipelineList[index].paths)
           }
           const lineSymbol = {
             type: 'simple-line',
@@ -278,6 +278,7 @@ export default {
         let location = []
         // 存放点击的管道id
         let pipeline_id = ''
+        const paths = []
         view.on('click', (event) => {
           view.hitTest(event).then(function(response) {
             const result = response.results[0]
@@ -290,6 +291,8 @@ export default {
           })
           const lat = +event.mapPoint.latitude.toFixed(6)
           const lon = +event.mapPoint.longitude.toFixed(6)
+          paths.push([lat, lon])
+          console.log(paths)
           location = [lat, lon]
         })
 
@@ -327,8 +330,8 @@ export default {
       const pipeline = await getPipelineList()
 
       if (this.$$isResponseSuccess(personnel) && this.$$isResponseSuccess(pipeline)) {
-        this.personnelList = personnel.data.items
-        this.pipelineList = pipeline.data.items
+        this.personnelList = Object.assign(this.personnelList, personnel.data.items)
+        this.pipelineList = Object.assign(this.pipelineList, pipeline.data.items)
       }
     }
   }

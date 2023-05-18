@@ -54,20 +54,27 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
-    path: '/personnel',
+    path: '/audit',
     component: Layout,
+    redirect: '/audit',
+    name: '',
+    meta: { title: '事件审核', icon: 'el-icon-edit' },
     children: [
       {
         path: '',
-        name: 'Personnel',
-        component: () => import('@/views/personnel/index'),
-        meta: { title: '人员管理', icon: 'el-icon-s-custom' }
+        name: 'Audit',
+        component: () => import('@/views/audit/index'),
+        meta: { title: '待审核事件', icon: 'el-icon-s-order' }
+      },
+      {
+        path: 'record',
+        name: 'Record',
+        component: () => import('@/views/audit/record'),
+        meta: { title: '审核记录', icon: 'el-icon-s-claim' }
       }
     ]
   },
-
   {
     path: '/task',
     component: Layout,
@@ -81,6 +88,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/personnel',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Personnel',
+        component: () => import('@/views/personnel/index'),
+        meta: { title: '人员管理', icon: 'el-icon-s-custom' }
+      }
+    ]
+  },
+  {
     path: '/profile',
     component: Layout,
     children: [
@@ -89,18 +108,6 @@ export const constantRoutes = [
         name: 'Profile',
         component: () => import('@/views/profile/index'),
         meta: { title: '个人中心', icon: 'el-icon-notebook-2' }
-      }
-    ]
-  },
-  {
-    path: '/audit',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'Audit',
-        component: () => import('@/views/audit/index'),
-        meta: { title: '事件审核', icon: 'el-icon-edit' }
       }
     ]
   },

@@ -15,15 +15,17 @@
       :total="total"
       @handleSelectionChange="handleSelectEvents"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange">
+      @handleSizeChange="handleSizeChange"
+    >
       <el-table-column fixed="left" type="selection" align="center" width="40" />
-      <el-table-column prop="title" label="事件标题" align="center" />
+      <el-table-column prop="title" label="事件标题" width="180" align="center" />
+      <el-table-column prop="description" label="事件描述" align="center" />
       <el-table-column label="处理人员" width="110" align="center">
         <template slot-scope="scope">
           {{ getPersonnelName(scope.row.handler_id) }}
         </template>
       </el-table-column>
-      <el-table-column prop="location" label="事发地点" width="110" align="center" />
+      <el-table-column prop="location" label="事发地点" width="180" align="center" />
       <el-table-column class-name="status-col" label="状态" width="110" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusFilter">
@@ -31,13 +33,13 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="submit_time" label="提交时间" width="150">
+      <el-table-column align="center" prop="submit_time" label="提交时间" width="160">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ new Date(scope.row.submit_time).toLocaleString() }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="handler_time" label="处理时间" width="150">
+      <el-table-column align="center" prop="handler_time" label="处理时间" width="160">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ new Date(scope.row.handler_time).toLocaleString() }}</span>
@@ -56,10 +58,38 @@
       </el-table-column>
     </CommonTable>
     <el-dialog
+      :visible.sync="uploadVisible"
+      :show-close="false"
+      :close-on-click-modal="false"
+      width="400px"
+    >
+      <el-upload
+        ref="upload"
+        class="upload el-upload-dragger"
+        :action="uploadURL"
+        accept=".xlsx"
+        :headers="headers"
+        :on-success="handleSuccess"
+        :on-error="handleError"
+        :on-remove="handleRemove"
+        :file-list="fileList"
+        :auto-upload="false"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleUploadSubmit">上 传</el-button>
+        <el-button @click="handleUploadCancel">关 闭</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
       title="新增事件"
       :visible.sync="dialogVisible"
       :show-close="false"
-      :close-on-click-modal="false">
+      :close-on-click-modal="false"
+    >
       <el-form ref="eventForm" :model="eventForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="eventForm.title" :disabled="onlyShow" autocomplete="off" />
@@ -75,12 +105,14 @@
           <el-select
             v-model.number="eventForm.status"
             placeholder="请选择状态"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in statusList"
               :key="item.status"
               :label="item.label"
-              :value="item.status" />
+              :value="item.status"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="处理人员" prop="handler_id">
@@ -88,12 +120,14 @@
           <el-select
             v-model.number="eventForm.handler_id"
             placeholder="请选择处理人员"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="处理时间" prop="handler_time">
@@ -104,12 +138,14 @@
           <el-select
             v-model.number="eventForm.manager_id"
             placeholder="请选择负责人"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="管道id" prop="pipeline_id">
@@ -117,12 +153,14 @@
           <el-select
             v-model.number="eventForm.pipeline_id"
             placeholder="请选择管道"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in pipelineList"
               :key="item.id"
               :label="item.name"
-              :value="item.id" />
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="事件级别" prop="level">
@@ -132,7 +170,8 @@
               v-for="item in levelList"
               :key="item.level"
               :label="item.label"
-              :value="item.level" />
+              :value="item.level"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -148,6 +187,9 @@
 import { getEventList, createEvent, deleteEvent, batchDeleteEvent } from '@/api/event'
 import { getPersonnelList } from '@/api/personnel'
 import { getPipelineList } from '@/api/pipeline'
+import { exportToExcel } from '@/utils/index.js'
+import { getToken } from '@/utils/auth'
+
 import CommonTable from '@/components/Table/index.vue'
 import Search from '@/components/Search/index.vue'
 
@@ -177,12 +219,22 @@ export default {
       total: 0,
       listLoading: false,
       dialogVisible: false,
+      uploadVisible: false,
       onlyShow: false,
+      uploadURL: process.env.VUE_APP_BASE_API + '/event/import',
+      headers: {
+        'Authorization': getToken()
+      },
       statusNoteMap: {
         0: '已完成',
         1: '待指派',
         2: '执行中',
         3: '已暂停'
+      },
+      levelMap: {
+        1: '一般',
+        2: '重要',
+        3: '紧急'
       },
       eventForm: {
         title: '',
@@ -211,7 +263,8 @@ export default {
         start: 0
       },
       selections: [],
-      searchTitle: ''
+      searchTitle: '',
+      fileList: []
     }
   },
   created() {
@@ -245,14 +298,44 @@ export default {
       this.dialogVisible = true
     },
     importBatch() {
-
+      this.uploadVisible = true
     },
     exportBatch() {
-
+      exportToExcel(this.selections.map(item => {
+        const newItem = JSON.parse(JSON.stringify(item))
+        delete newItem.id
+        delete newItem.handler_id
+        delete newItem.manager_id
+        newItem.status = this.statusNoteMap[newItem.status]
+        newItem.level = this.levelMap[newItem.level]
+        return newItem
+      }), ['事件标题', '事件描述', '事件等级', '事发地点', '状态', '提交时间', '处理时间', '管道'], '事件列表' + Date.now())
     },
     getPersonnelName(handler_id) {
       const handler = this.personnelList.find(item => item.id === handler_id)
       return handler?.name
+    },
+    handleUploadCancel() {
+      this.uploadVisible = false
+    },
+    handleUploadSubmit() {
+      this.$refs.upload.submit()
+    },
+    handleRemove(file, fileList) {
+      const removeIndex = this.fileList.findIndex(item => item.uid === file.uid)
+      this.fileList.shift(removeIndex, 1)
+    },
+    handleSuccess(res, file, fileList) {
+      if (this.$$isResponseSuccess(res)) {
+        this.$message.success('导入成功')
+        this.fetchData()
+      } else {
+        this.$message.error('导入失败')
+      }
+    },
+    handleError(err, file, fileList) {
+      console.log(err)
+      this.$message.error('导入失败')
     },
     handleCancel() {
       this.eventForm = this.$options.data.call(this).eventForm

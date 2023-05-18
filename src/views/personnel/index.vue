@@ -15,7 +15,8 @@
       :loading="listLoading"
       @handleSelectionChange="handleSelectPersonnels"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange">
+      @handleSizeChange="handleSizeChange"
+    >
       <el-table-column fixed="left" type="selection" align="center" width="40" />
       <el-table-column prop="name" align="center" label="姓名" />
       <el-table-column align="center" label="身份">
@@ -42,7 +43,8 @@
       :visible.sync="uploadVisible"
       :show-close="false"
       :close-on-click-modal="false"
-      width="400px">
+      width="400px"
+    >
       <el-upload
         ref="upload"
         class="upload el-upload-dragger"
@@ -53,13 +55,14 @@
         :on-error="handleError"
         :on-remove="handleRemove"
         :file-list="fileList"
-        :auto-upload="false">
+        :auto-upload="false"
+      >
         <i class="el-icon-upload" />
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
       </el-upload>
       <span slot="footer" class="dialog-footer">
-        <el-button v-show="!onlyShow" type="primary" @click="handleUploadSubmit">上 传</el-button>
+        <el-button type="primary" @click="handleUploadSubmit">上 传</el-button>
         <el-button @click="handleUploadCancel">关 闭</el-button>
       </span>
     </el-dialog>
@@ -67,13 +70,15 @@
       title="新增人员"
       :visible.sync="dialogVisible"
       :show-close="false"
-      :close-on-click-modal="false">
+      :close-on-click-modal="false"
+    >
       <el-form
         ref="personnelForm"
         :model="personnelForm"
         status-icon
         :rules="rules"
-        label-width="100px">
+        label-width="100px"
+      >
         <el-form-item label="姓名" prop="name">
           <el-input v-model="personnelForm.name" :disabled="onlyShow" />
         </el-form-item>
@@ -82,12 +87,14 @@
           <el-select
             v-model.number="personnelForm.identity"
             placeholder="请选择身份"
-            :disabled="onlyShow">
+            :disabled="onlyShow"
+          >
             <el-option
               v-for="item in identityList"
               :key="item.indentity"
               :label="item.label"
-              :value="item.indentity" />
+              :value="item.indentity"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="身份证号" prop="identityNo">
@@ -187,10 +194,11 @@ export default {
     },
     exportBatch() {
       exportToExcel(this.selections.map(item => {
-        delete item.id
-        delete item.actor
-        item.identity = this.personnelMap[item.identity]
-        return item
+        const newItem = JSON.parse(JSON.stringify(item))
+        delete newItem.id
+        delete newItem.actor
+        newItem.identity = this.personnelMap[newItem.identity]
+        return newItem
       }), ['姓名', '身份', '身份证号', '电话号码', '邮箱'], '人员列表' + Date.now())
     },
     handleCancel() {
