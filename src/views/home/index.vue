@@ -1,7 +1,11 @@
 <template>
   <div class="home-container">
     <div id="mapview" />
-    <el-dialog title="新增事件" :visible.sync="dialogVisible" :show-close="false" :close-on-click-modal="false">
+    <el-dialog
+      title="新增事件"
+      :visible.sync="dialogVisible"
+      :show-close="false"
+      :close-on-click-modal="false">
       <el-form ref="eventForm" :model="eventForm" status-icon :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="eventForm.title" autocomplete="off" />
@@ -14,30 +18,22 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <!-- <el-input v-model.number="eventForm.status" /> -->
-          <el-select
-            v-model.number="eventForm.status"
-            placeholder="请选择状态"
-          >
+          <el-select v-model.number="eventForm.status" placeholder="请选择状态">
             <el-option
               v-for="item in statusList"
               :key="item.status"
               :label="item.label"
-              :value="item.status"
-            />
+              :value="item.status" />
           </el-select>
         </el-form-item>
         <el-form-item label="处理人员" prop="handler_id">
           <!-- <el-input v-model.number="eventForm.handler_id" /> -->
-          <el-select
-            v-model.number="eventForm.handler_id"
-            placeholder="请选择处理人员"
-          >
+          <el-select v-model.number="eventForm.handler_id" placeholder="请选择处理人员">
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id"
-            />
+              :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="处理时间" prop="handler_time">
@@ -45,30 +41,22 @@
         </el-form-item>
         <el-form-item label="负责人id" prop="manager_id">
           <!-- <el-input v-model.number="eventForm.manager_id" /> -->
-          <el-select
-            v-model.number="eventForm.manager_id"
-            placeholder="请选择负责人"
-          >
+          <el-select v-model.number="eventForm.manager_id" placeholder="请选择负责人">
             <el-option
               v-for="item in personnelList"
               :key="item.id"
               :label="item.name"
-              :value="item.id"
-            />
+              :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="管道id" prop="pipeline_id">
           <!-- <el-input v-model.number="eventForm.pipeline_id" /> -->
-          <el-select
-            v-model.number="eventForm.pipeline_id"
-            placeholder="请选择管道"
-          >
+          <el-select v-model.number="eventForm.pipeline_id" placeholder="请选择管道">
             <el-option
               v-for="item in pipelineList"
               :key="item.id"
               :label="item.name"
-              :value="item.id"
-            />
+              :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="事件级别" prop="level">
@@ -78,8 +66,7 @@
               v-for="item in levelList"
               :key="item.level"
               :label="item.label"
-              :value="item.level"
-            />
+              :value="item.level" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -245,6 +232,7 @@ export default {
           }
         })
         for (const index in that.pipelineList) {
+          const colors = ['#E600A9', '#fe0000', '#23aaf2', '#f9bf1a', '#8881f9']
           // 创建一个简单的Polyline
           const lineGeometry = {
             type: 'polyline',
@@ -252,7 +240,7 @@ export default {
           }
           const lineSymbol = {
             type: 'simple-line',
-            color: '#E600A9',
+            color: colors[index],
             width: 3
           }
           // 创建一个Graphic对象，用于在地图上显示Polyline
@@ -356,5 +344,4 @@ export default {
     justify-content: flex-end;
   }
 }
-
 </style>
